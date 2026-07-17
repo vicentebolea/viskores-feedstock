@@ -1,0 +1,432 @@
+diff --git a/viskores/filter/scalar_topology/worklet/branch_decomposition/HierarchicalVolumetricBranchDecomposer.h b/viskores/filter/scalar_topology/worklet/branch_decomposition/HierarchicalVolumetricBranchDecomposer.h
+index 0b0f50417e..cdfb300757 100644
+--- a/viskores/filter/scalar_topology/worklet/branch_decomposition/HierarchicalVolumetricBranchDecomposer.h
++++ b/viskores/filter/scalar_topology/worklet/branch_decomposition/HierarchicalVolumetricBranchDecomposer.h
+@@ -137,13 +137,13 @@
+ 
+ // Worklets
+ #include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/BranchEndComparator.h>
+-#include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesPointerDoublingWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesPtrDoublingWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/GetOuterEndWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeBestUpDownEdgeWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeInitSuperarcListWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/SuperArcVolumetricComparatorIndirectGlobalIdComparator.h>
++#include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownVolBestEdgeWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownVolInitSuperarcList.h>
++#include <viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/SuperArcVolComparatorGlobalId.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/NotNoSuchElementPredicate.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/PrintVectors.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+diff --git a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CMakeLists.txt b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CMakeLists.txt
+index 115012c407..9c55abdb8a 100644
+--- a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CMakeLists.txt
++++ b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CMakeLists.txt
+@@ -19,14 +19,14 @@
+ set(headers
+   BranchEndComparator.h
+   BranchEndGlobalUpdateWorklet.h
+-  CollapseBranchesPointerDoublingWorklet.h
++  CollapseBranchesPtrDoublingWorklet.h
+   CollapseBranchesWorklet.h
+   FindBestSupernodeWorklet.h
+   GetOuterEndWorklet.h
+-  LocalBestUpDownByVolumeBestUpDownEdgeWorklet.h
+-  LocalBestUpDownByVolumeInitSuperarcListWorklet.h
++  LocalBestUpDownVolBestEdgeWorklet.h
++  LocalBestUpDownVolInitSuperarcList.h
+   LocalBestUpDownByVolumeWorklet.h
+-  SuperArcVolumetricComparatorIndirectGlobalIdComparator.h
++  SuperArcVolComparatorGlobalId.h
+ )
+ 
+ viskores_declare_headers(${headers})
+diff --git a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesPointerDoublingWorklet.h b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesPtrDoublingWorklet.h
+similarity index 98%
+rename from viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesPointerDoublingWorklet.h
+rename to viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesPtrDoublingWorklet.h
+index 5613af0020..4f7a477a55 100644
+--- a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesPointerDoublingWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/CollapseBranchesPtrDoublingWorklet.h
+@@ -51,8 +51,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_CollapseBranchesPointerDoublingWorklet_h
+-#define viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_CollapseBranchesPointerDoublingWorklet_h
++#ifndef viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_CollapseBranchesPtrDoublingWorklet_h
++#define viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_CollapseBranchesPtrDoublingWorklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeBestUpDownEdgeWorklet.h b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownVolBestEdgeWorklet.h
+similarity index 97%
+rename from viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeBestUpDownEdgeWorklet.h
+rename to viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownVolBestEdgeWorklet.h
+index 5e7b3ab452..cc8f4e334d 100644
+--- a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeBestUpDownEdgeWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownVolBestEdgeWorklet.h
+@@ -51,8 +51,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_LocalBestUpDownByVolumeBestUpDownEdgeWorklet_h
+-#define viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_LocalBestUpDownByVolumeBestUpDownEdgeWorklet_h
++#ifndef viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_LocalBestUpDownVolBestEdgeWorklet_h
++#define viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_LocalBestUpDownVolBestEdgeWorklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeInitSuperarcListWorklet.h b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownVolInitSuperarcList.h
+similarity index 96%
+rename from viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeInitSuperarcListWorklet.h
+rename to viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownVolInitSuperarcList.h
+index e6644d535e..3460a3e237 100644
+--- a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownByVolumeInitSuperarcListWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/LocalBestUpDownVolInitSuperarcList.h
+@@ -51,8 +51,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_LocalBestUpDownByVolumeInitSuperarcListWorklet_h
+-#define viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_LocalBestUpDownByVolumeInitSuperarcListWorklet_h
++#ifndef viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_LocalBestUpDownVolInitSuperarcList_h
++#define viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_LocalBestUpDownVolInitSuperarcList_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/SuperArcVolumetricComparatorIndirectGlobalIdComparator.h b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/SuperArcVolComparatorGlobalId.h
+similarity index 97%
+rename from viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/SuperArcVolumetricComparatorIndirectGlobalIdComparator.h
+rename to viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/SuperArcVolComparatorGlobalId.h
+index b7ecae2244..16196cbff0 100644
+--- a/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/SuperArcVolumetricComparatorIndirectGlobalIdComparator.h
++++ b/viskores/filter/scalar_topology/worklet/branch_decomposition/hierarchical_volumetric_branch_decomposer/SuperArcVolComparatorGlobalId.h
+@@ -67,8 +67,8 @@
+ //
+ //=======================================================================================
+ 
+-#ifndef viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_SuperarcVolumetricComparatorIndirectGlobalIdComparator_h
+-#define viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_SuperarcVolumetricComparatorIndirectGlobalIdComparator_h
++#ifndef viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_SuperArcVolComparatorGlobalId_h
++#define viskores_filter_scalar_topology_worklet_branch_decomposition_hierarchical_volumetric_branch_decomposer_SuperArcVolComparatorGlobalId_h
+ 
+ #include <viskores/cont/ArrayHandle.h>
+ #include <viskores/cont/ExecutionObjectBase.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_augmented/ContourTreeMaker.h b/viskores/filter/scalar_topology/worklet/contourtree_augmented/ContourTreeMaker.h
+index 05c0b43c54..087e41c02b 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_augmented/ContourTreeMaker.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_augmented/ContourTreeMaker.h
+@@ -79,7 +79,7 @@
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_HypernodesSetFirstSuperchild.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_PermuteArcs.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_ResetHyperparentsId.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetFirstSupernodePerIterationWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetFirstSupernodePerIter.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetNewHypernodesAndArcs.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeRegularStructure_LocateSuperarcs.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeRegularStructure_SetArcs.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/CMakeLists.txt b/viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/CMakeLists.txt
+index bd9c5b99f6..ca0269cc19 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/CMakeLists.txt
++++ b/viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/CMakeLists.txt
+@@ -24,7 +24,7 @@ set(headers
+   ComputeHyperAndSuperStructure_PermuteArcs.h
+   ComputeHyperAndSuperStructure_ResetHyperparentsId.h
+   ComputeHyperAndSuperStructure_SetNewHypernodesAndArcs.h
+-  ComputeHyperAndSuperStructure_SetFirstSupernodePerIterationWorklet.h
++  ComputeHyperAndSuperStructure_SetFirstSupernodePerIter.h
+   ComputeRegularStructure_LocateSuperarcs.h
+   ComputeRegularStructure_SetArcs.h
+   ContourTreeSuperNodeComparator.h
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetFirstSupernodePerIterationWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetFirstSupernodePerIter.h
+similarity index 99%
+rename from viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetFirstSupernodePerIterationWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetFirstSupernodePerIter.h
+index a431db1285..b12ecd4c7b 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetFirstSupernodePerIterationWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_augmented/contourtreemaker/ComputeHyperAndSuperStructure_SetFirstSupernodePerIter.h
+@@ -58,8 +58,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_augmented_contourtree_maker_inc_compute_hyper_and_super_structure_set_first_supernode_per_iteration_worklet_h
+-#define viskores_worklet_contourtree_augmented_contourtree_maker_inc_compute_hyper_and_super_structure_set_first_supernode_per_iteration_worklet_h
++#ifndef viskores_worklet_contourtree_augmented_contourtree_maker_inc_compute_hyper_and_super_structure_set_first_supernode_per_iter_h
++#define viskores_worklet_contourtree_augmented_contourtree_maker_inc_compute_hyper_and_super_structure_set_first_supernode_per_iter_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/BoundaryTreeMaker.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/BoundaryTreeMaker.h
+index d81e1c0751..2e27e8461c 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/BoundaryTreeMaker.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/BoundaryTreeMaker.h
+@@ -73,12 +73,12 @@
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/InteriorForest.h>
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AddTerminalFlagsToUpDownNeighboursWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryWithNecessaryInteriorSupernodesAppendNecessarySupernodesWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryWithNecessaryInteriorSupernodesUnsetBoundarySupernodesWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryAppendSupernodesWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryUnsetSupernodesWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/BoundaryTreeNodeComparator.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/BoundaryVerticesPerSuperArcWorklets.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesCopyNecessaryRegularNodesWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesFillBoundaryTreeSuperarcsWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesCopyRegularNodesWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesFillBTreeSuperarcsWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesFindNewSuperarcsWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesResolveRootWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesTransferVerticesWorklet.h>
+@@ -94,7 +94,7 @@
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PointerDoubleUpDownNeighboursWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsComputeGroupTotalsWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsSubtractDependentCountsWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferCumulativeCountsWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferCumCountsWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferDependentCountsWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/SetInteriorForestWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/SetUpAndDownNeighboursWorklet.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/HierarchicalAugmenter.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/HierarchicalAugmenter.h
+index 981767081a..bfea59efd0 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/HierarchicalAugmenter.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/HierarchicalAugmenter.h
+@@ -110,7 +110,7 @@
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/AttachmentSuperparentAndIndexComparator.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CopyBaseRegularStructureWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsData.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsSetFirstSupernodePerIterationWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsSetFirstSupernodePerIterWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/FillEmptyIterationWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/FindSuperparentForNecessaryNodesWorklet.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/HierarchicalHyperSweeper.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/HierarchicalHyperSweeper.h
+index 5c1436bf5a..dbc96a99d5 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/HierarchicalHyperSweeper.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/HierarchicalHyperSweeper.h
+@@ -94,9 +94,9 @@
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/PrintGraph.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/ComputeSuperarcDependentWeightsWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/ComputeSuperarcTransferWeightsWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountComputeSuperparentIdsWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountInitalizeCountsWorklet.h>
+-#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountSubtractLowEndWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountInitCountsWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountSubtractLowEndWorklet.h>
++#include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountSuperparentIds.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/TransferTargetComperator.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/TransferWeightsUpdateLHEWorklet.h>
+ #include <viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/TransferWeightsUpdateLHEWorkletRound2.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryWithNecessaryInteriorSupernodesAppendNecessarySupernodesWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryAppendSupernodesWorklet.h
+similarity index 97%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryWithNecessaryInteriorSupernodesAppendNecessarySupernodesWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryAppendSupernodesWorklet.h
+index 0fbddb6253..7b378f7d7f 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryWithNecessaryInteriorSupernodesAppendNecessarySupernodesWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryAppendSupernodesWorklet.h
+@@ -58,8 +58,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_distributed_bract_maker_augment_boundary_with_necessary_interior_supernodes_append_necessary_supernodes_worklet_h
+-#define viskores_worklet_contourtree_distributed_bract_maker_augment_boundary_with_necessary_interior_supernodes_append_necessary_supernodes_worklet_h
++#ifndef viskores_worklet_contourtree_distributed_bract_maker_augment_boundary_append_supernodes_worklet_h
++#define viskores_worklet_contourtree_distributed_bract_maker_augment_boundary_append_supernodes_worklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryWithNecessaryInteriorSupernodesUnsetBoundarySupernodesWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryUnsetSupernodesWorklet.h
+similarity index 97%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryWithNecessaryInteriorSupernodesUnsetBoundarySupernodesWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryUnsetSupernodesWorklet.h
+index ba311f5ef1..fd0587f0c8 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryWithNecessaryInteriorSupernodesUnsetBoundarySupernodesWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/AugmentBoundaryUnsetSupernodesWorklet.h
+@@ -58,8 +58,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_distributed_bract_maker_augment_boundary_with_necessary_interior_supernodes_unset_boundary_supernodes_worklet_h
+-#define viskores_worklet_contourtree_distributed_bract_maker_augment_boundary_with_necessary_interior_supernodes_unset_boundary_supernodes_worklet_h
++#ifndef viskores_worklet_contourtree_distributed_bract_maker_augment_boundary_unset_supernodes_worklet_h
++#define viskores_worklet_contourtree_distributed_bract_maker_augment_boundary_unset_supernodes_worklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CMakeLists.txt b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CMakeLists.txt
+index 4788567ba7..f04f5f4644 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CMakeLists.txt
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CMakeLists.txt
+@@ -21,23 +21,23 @@ set(headers
+   BoundaryVerticesPerSuperArcWorklets.h
+   PropagateBoundaryCountsSubtractDependentCountsWorklet.h
+   PropagateBoundaryCountsTransferDependentCountsWorklet.h
+-  PropagateBoundaryCountsTransferCumulativeCountsWorklet.h
++  PropagateBoundaryCountsTransferCumCountsWorklet.h
+   PropagateBoundaryCountsComputeGroupTotalsWorklet.h
+   FindNecessaryInteriorSupernodesFindNodesWorklet.h
+   FindNecessaryInteriorSetSuperparentNecessaryWorklet.h
+-  AugmentBoundaryWithNecessaryInteriorSupernodesUnsetBoundarySupernodesWorklet.h
+-  AugmentBoundaryWithNecessaryInteriorSupernodesAppendNecessarySupernodesWorklet.h
++  AugmentBoundaryUnsetSupernodesWorklet.h
++  AugmentBoundaryAppendSupernodesWorklet.h
+   FindBoundaryTreeSuperarcsSuperarcToWorklet.h
+   SetUpAndDownNeighboursWorklet.h
+   IdentifyRegularisedSupernodesStepOneWorklet.h
+   IdentifyRegularisedSupernodesStepTwoWorklet.h
+   AddTerminalFlagsToUpDownNeighboursWorklet.h
+   PointerDoubleUpDownNeighboursWorklet.h
+-  CompressRegularisedNodesCopyNecessaryRegularNodesWorklet.h
++  CompressRegularisedNodesCopyRegularNodesWorklet.h
+   CompressRegularisedNodesFindNewSuperarcsWorklet.h
+   CompressRegularisedNodesResolveRootWorklet.h
+   CompressRegularisedNodesTransferVerticesWorklet.h
+-  CompressRegularisedNodesFillBoundaryTreeSuperarcsWorklet.h
++  CompressRegularisedNodesFillBTreeSuperarcsWorklet.h
+   SetInteriorForestWorklet.h
+   SumFunctor.h
+   NoSuchElementFunctor.h
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesCopyNecessaryRegularNodesWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesCopyRegularNodesWorklet.h
+similarity index 97%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesCopyNecessaryRegularNodesWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesCopyRegularNodesWorklet.h
+index 2f7cb0345a..61c9835446 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesCopyNecessaryRegularNodesWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesCopyRegularNodesWorklet.h
+@@ -58,8 +58,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_distributed_bract_maker_compress_regularised_nodes_copy_necessary_regular_nodes_worklet_h
+-#define viskores_worklet_contourtree_distributed_bract_maker_compress_regularised_nodes_copy_necessary_regular_nodes_worklet_h
++#ifndef viskores_worklet_contourtree_distributed_bract_maker_compress_regularised_nodes_copy_regular_nodes_worklet_h
++#define viskores_worklet_contourtree_distributed_bract_maker_compress_regularised_nodes_copy_regular_nodes_worklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesFillBoundaryTreeSuperarcsWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesFillBTreeSuperarcsWorklet.h
+similarity index 100%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesFillBoundaryTreeSuperarcsWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/CompressRegularisedNodesFillBTreeSuperarcsWorklet.h
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferCumulativeCountsWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferCumCountsWorklet.h
+similarity index 98%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferCumulativeCountsWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferCumCountsWorklet.h
+index 04e6244b4a..19da479e04 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferCumulativeCountsWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/boundary_tree_maker/PropagateBoundaryCountsTransferCumCountsWorklet.h
+@@ -58,8 +58,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_distributed_bract_maker_propagate_boundary_counts_transfer_cumulative_counts_worklet_h
+-#define viskores_worklet_contourtree_distributed_bract_maker_propagate_boundary_counts_transfer_cumulative_counts_worklet_h
++#ifndef viskores_worklet_contourtree_distributed_bract_maker_propagate_boundary_counts_transfer_cum_counts_worklet_h
++#define viskores_worklet_contourtree_distributed_bract_maker_propagate_boundary_counts_transfer_cum_counts_worklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CMakeLists.txt b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CMakeLists.txt
+index 13416fcfe4..95d4ecf630 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CMakeLists.txt
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CMakeLists.txt
+@@ -33,7 +33,7 @@ set(headers
+   FillEmptyIterationWorklet.h
+   CreateSuperarcsWorklet.h
+   CreateSuperarcsData.h
+-  CreateSuperarcsSetFirstSupernodePerIterationWorklet.h
++  CreateSuperarcsSetFirstSupernodePerIterWorklet.h
+   HierarchicalAugmenterInOutData.h
+ )
+ 
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsSetFirstSupernodePerIterationWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsSetFirstSupernodePerIterWorklet.h
+similarity index 98%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsSetFirstSupernodePerIterationWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsSetFirstSupernodePerIterWorklet.h
+index 7c3d0e3cb2..a88c14c710 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsSetFirstSupernodePerIterationWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_augmenter/CreateSuperarcsSetFirstSupernodePerIterWorklet.h
+@@ -51,8 +51,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_distributed_hierarchical_augmenter_create_auperarcs_set_first_supernode_per_iteration_worklet_h
+-#define viskores_worklet_contourtree_distributed_hierarchical_augmenter_create_auperarcs_set_first_supernode_per_iteration_worklet_h
++#ifndef viskores_worklet_contourtree_distributed_hierarchical_augmenter_create_superarcs_set_first_supernode_per_iter_worklet_h
++#define viskores_worklet_contourtree_distributed_hierarchical_augmenter_create_superarcs_set_first_supernode_per_iter_worklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/CMakeLists.txt b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/CMakeLists.txt
+index bb48f0adbc..7cb5b91f1e 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/CMakeLists.txt
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/CMakeLists.txt
+@@ -17,9 +17,9 @@
+ ##============================================================================
+ 
+ set(headers
+-  InitializeIntrinsicVertexCountComputeSuperparentIdsWorklet.h
+-  InitializeIntrinsicVertexCountInitalizeCountsWorklet.h
+-  InitializeIntrinsicVertexCountSubtractLowEndWorklet.h
++  InitIntrinsicVertexCountSuperparentIds.h
++  InitIntrinsicVertexCountInitCountsWorklet.h
++  InitIntrinsicVertexCountSubtractLowEndWorklet.h
+   ComputeSuperarcDependentWeightsWorklet.h
+   ComputeSuperarcTransferWeightsWorklet.h
+   TransferTargetComperator.h
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountInitalizeCountsWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountInitCountsWorklet.h
+similarity index 97%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountInitalizeCountsWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountInitCountsWorklet.h
+index 197915aa81..1be87f2e81 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountInitalizeCountsWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountInitCountsWorklet.h
+@@ -58,8 +58,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_initialize_intrinsic_vertex_count_initialize_counts_worklet_h
+-#define viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_initialize_intrinsic_vertex_count_initialize_counts_worklet_h
++#ifndef viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_init_intrinsic_vertex_count_init_counts_worklet_h
++#define viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_init_intrinsic_vertex_count_init_counts_worklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountSubtractLowEndWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountSubtractLowEndWorklet.h
+similarity index 97%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountSubtractLowEndWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountSubtractLowEndWorklet.h
+index 9b2ef49617..7534ffcb9d 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountSubtractLowEndWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountSubtractLowEndWorklet.h
+@@ -58,8 +58,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_initialize_intrinsic_vertex_count_subtract_low_end_worklet_h
+-#define viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_initialize_intrinsic_vertex_count_subtract_low_end_worklet_h
++#ifndef viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_init_intrinsic_vertex_count_subtract_low_end_worklet_h
++#define viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_init_intrinsic_vertex_count_subtract_low_end_worklet_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
+diff --git a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountComputeSuperparentIdsWorklet.h b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountSuperparentIds.h
+similarity index 97%
+rename from viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountComputeSuperparentIdsWorklet.h
+rename to viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountSuperparentIds.h
+index c8ee462aa2..4aaee6b24e 100644
+--- a/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitializeIntrinsicVertexCountComputeSuperparentIdsWorklet.h
++++ b/viskores/filter/scalar_topology/worklet/contourtree_distributed/hierarchical_hyper_sweeper/InitIntrinsicVertexCountSuperparentIds.h
+@@ -58,8 +58,8 @@
+ //  Oliver Ruebel (LBNL)
+ //==============================================================================
+ 
+-#ifndef viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_initialize_intrinsic_vertex_count_compute_superparent_ids_worklet_h
+-#define viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_initialize_intrinsic_vertex_count_compute_superparent_ids_worklet_h
++#ifndef viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_init_intrinsic_vertex_count_superparent_ids_h
++#define viskores_worklet_contourtree_distributed_hierarchical_hyper_sweeper_init_intrinsic_vertex_count_superparent_ids_h
+ 
+ #include <viskores/filter/scalar_topology/worklet/contourtree_augmented/Types.h>
+ #include <viskores/worklet/WorkletMapField.h>
