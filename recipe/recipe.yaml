@@ -88,12 +88,13 @@ requirements:
   host:
     - glew
     - hdf5
-    - mesalib
     - zfp
     - if: cuda_compiler_version != "None"
       then: cuda-version=${{ cuda_compiler_version }}
     - if: linux
       then: libgomp
+    - if: linux
+      then: mesalib
     - if: osx
       then: llvm-openmp
   run:
